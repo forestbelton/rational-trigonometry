@@ -70,13 +70,18 @@ theorem line0_point (l : Line0 K) : HasPoint (line0 l) p ↔ ∃ c, p = ⟨c * -
   · rintro ⟨c, rfl⟩
     ring
 
--- == Joint sanity lemmas ==
 theorem line_between_a (a b : Point K)
 : (anb : Apart a b)
 → HasPoint (line_between a b anb) a
-:= sorry
+:= by
+  unfold Apart HasPoint line_between
+  intro anb
+  ring
 
 theorem line_between_b (a b : Point K)
 : (anb : Apart a b)
 → HasPoint (line_between a b anb) b
-:= sorry
+:= by
+  unfold Apart HasPoint line_between
+  intro anb
+  ring
