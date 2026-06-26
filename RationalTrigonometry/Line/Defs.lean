@@ -43,6 +43,9 @@ theorem line0_inj (l m : Line0 K) : l = m ↔ line0 l = line0 m
     simp only [Line.mk.injEq, and_true] at h
     exact Line0.ext h.left h.right
 
+def IsNull (l : Line K) : Prop :=
+  l.a * l.a + l.b * l.b = 0
+
 @[ext]
 structure Point (K : Type*) [Field K] where
   x : K
