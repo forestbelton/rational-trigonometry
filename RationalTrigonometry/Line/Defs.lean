@@ -24,24 +24,13 @@ structure Line0 (K : Type*) [Field K] where
   ab_ne_zero : a ≠ 0 ∨ b ≠ 0
 
 @[ext]
-structure Line (K : Type*) [Field K] where
-  a : K
-  b : K
+structure Line (K : Type*) [Field K] extends Line0 K where
   c : K
-  ab_ne_zero : a ≠ 0 ∨ b ≠ 0
 
 def line0 (l : Line0 K) : Line K :=
   { a := l.a, b := l.b, c := 0, ab_ne_zero := l.ab_ne_zero }
 
-theorem line0_inj (l m : Line0 K) : l = m ↔ line0 l = line0 m
-:= by
-  constructor
-  · intro h
-    rw [h]
-  · intro h
-    unfold line0 at h
-    simp only [Line.mk.injEq, and_true] at h
-    exact Line0.ext h.left h.right
+instance : Coe (Line0 K) (Line K) := ⟨line0⟩
 
 def IsNull (l : Line K) : Prop :=
   l.a * l.a + l.b * l.b = 0
@@ -58,3 +47,6 @@ def Apart (a b : Point K) : Prop :=
   a.x ≠ b.x ∨ a.y ≠ b.y
 
 def origin : Point K := ⟨0, 0⟩
+
+def Collinear (a b c : Point K) : Prop :=
+  ∃ l : Line K, HasPoint l a ∧ HasPoint l b ∧ HasPoint l c

@@ -19,15 +19,14 @@ through the origin.
 
 variable {K : Type*} [Field K]
 
-def line_between : (a b : Point K) → Apart a b → Line K := fun a b anb => ⟨
-  b.y - a.y,
-  a.x - b.x,
-  a.y * b.x - a.x * b.y,
-  by
-    rcases anb with hx | hy
-    · exact Or.inr (sub_ne_zero.mpr hx)
-    · exact Or.inl (sub_ne_zero.mpr hy.symm)
-⟩
+def line_between : (a b : Point K) → Apart a b → Line K := fun a b anb =>
+  { a := b.y - a.y,
+    b := a.x - b.x,
+    c := a.y * b.x - a.x * b.y,
+    ab_ne_zero := by
+      rcases anb with hx | hy
+      · exact Or.inr (sub_ne_zero.mpr hx)
+      · exact Or.inl (sub_ne_zero.mpr hy.symm) }
 
 theorem line_between_left (a b : Point K)
 : (anb : Apart a b)
