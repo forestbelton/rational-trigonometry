@@ -16,3 +16,9 @@ rev = "v4.32.0-rc1"
 
 [[lean_lib]]
 name = "RationalTrigonometry"
+
+# Development-only: the `polyrith` tactic (revived to call a local `sage`).
+# Not in `defaultTargets`, so it is only built when explicitly requested
+# (`lake build PolyrithLocal`) or imported from a scratch file while writing proofs.
+[[lean_lib]]
+name = "PolyrithLocal"
