@@ -18,8 +18,8 @@ field by using multivariable polynomial hypotheses/proof terms over the same fie
 Used as is, the tactic makes use of those hypotheses in the local context that are
 over the same field as the target. However, the user can also specify which hypotheses
 from the local context to use, along with proof terms that might not already be in the
-local context. Note: since this tactic uses SageMath via an API call,
-it can only be used with a working internet connection.
+local context. Note: since this tactic uses SageMath via subprocess call,
+it can only be used with a local installation of SageMath.
 
 ## Implementation Notes
 
@@ -31,7 +31,7 @@ to the user to find a collection of good coefficients. The `polyrith` tactic aut
 process using the theory of Groebner bases.
 
 Polyrith does this by first parsing the relevant hypotheses into a form that SageMath can
-understand. It then calls the SageMath API to compute the coefficients. These coefficients are
+understand. It then invokes the SageMath process to compute the coefficients. These coefficients are
 then sent back to Lean, which parses them into pexprs. The information is then given to the
 `linear_combination` tactic, which completes the process by checking the certificate.
 
@@ -45,7 +45,6 @@ certificate.
 * Give Sage more information about the specific ring being used for the coefficients. For now,
   we always use ℚ (or `QQ` in Sage).
 * Handle `•` terms.
-* Support local Sage installations.
 
 ## References
 
@@ -445,10 +444,7 @@ is suggested to the user.
   `h1`, `h2`, `h3`, and proofs `t1`, `t2`, `t3`. It will ignore the rest of the local context.
 
 Notes:
-* This tactic only works with a working internet connection, since it calls Sage
-  using the SageCell web API at <https://sagecell.sagemath.org/>.
-  Many thanks to the Sage team and organization for allowing this use.
-* This tactic assumes that the user has `curl` available on path.
+* This tactic only works with a working local installation of SageMath.
 
 Examples:
 
