@@ -29,6 +29,22 @@ def line_between : (a b : Point K) → Apart a b → Line K := fun a b anb => �
     · exact Or.inl (sub_ne_zero.mpr hy.symm)
 ⟩
 
+theorem line_between_left (a b : Point K)
+: (anb : Apart a b)
+→ HasPoint (line_between a b anb) a
+:= by
+  unfold Apart HasPoint line_between
+  intro anb
+  ring
+
+theorem line_between_right (a b : Point K)
+: (anb : Apart a b)
+→ HasPoint (line_between a b anb) b
+:= by
+  unfold Apart HasPoint line_between
+  intro anb
+  ring
+
 theorem line_between_uniq {a b : Point K} (anb : Apart a b)
 : (HasPoint l a ∧ HasPoint l b) ↔ Proportional l (line_between a b anb) := by
   unfold Proportional
@@ -70,18 +86,57 @@ theorem line0_point (l : Line0 K) : HasPoint (line0 l) p ↔ ∃ c, p = ⟨c * -
   · rintro ⟨c, rfl⟩
     ring
 
-theorem line_between_a (a b : Point K)
-: (anb : Apart a b)
-→ HasPoint (line_between a b anb) a
+def meet (l m : Line K) : Point K :=
+  ⟨(l.b * m.c - l.c * m.b) / (l.a * m.b - m.a * l.b),
+   (l.c * m.a - l.a * m.c) / (l.a * m.b - m.a * l.b)⟩
+
+theorem meet_left (l m : Line K) (h : ¬Parallel l m) : HasPoint l (meet l m)
 := by
-  unfold Apart HasPoint line_between
-  intro anb
+  unfold Parallel at h
+  unfold HasPoint meet
+  apply add_right_cancel (b := -l.c)
+  field_simp
+  simp only [add_neg_cancel_right, zero_add]
+  apply mul_right_cancel₀ h
+  rw [div_mul, mul_comm l.b m.a, div_self h]
+  field_simp
   ring
 
-theorem line_between_b (a b : Point K)
-: (anb : Apart a b)
-→ HasPoint (line_between a b anb) b
+theorem meet_right (l m : Line K) (h : ¬Parallel l m) : HasPoint m (meet l m)
 := by
-  unfold Apart HasPoint line_between
-  intro anb
+  unfold Parallel at h
+  unfold HasPoint meet
+  apply add_right_cancel (b := -m.c)
+  field_simp
+  simp only [add_neg_cancel_right, zero_add]
+  apply mul_right_cancel₀ h
+  rw [div_mul, mul_comm m.b l.a, div_self h]
+  field_simp
   ring
+
+theorem meet_uniq (l m : Line K) (h : ¬ Parallel l m) (p : Point K)
+: HasPoint l p ∧ HasPoint m p
+↔ p = (meet l m)
+:= by
+  constructor
+  · intro ⟨a, b⟩
+    unfold HasPoint at a b
+    apply Point.ext
+    · change p.x = (l.b * m.c - l.c * m.b) / (l.a * m.b - m.a * l.b)
+      rw [eq_div_iff h]
+      linear_combination m.b * a - l.b * b
+    · change p.y = (l.c * m.a - l.a * m.c) / (l.a * m.b - m.a * l.b)
+      rw [eq_div_iff h]
+      linear_combination l.a * b - m.a * a
+  · rintro rfl
+    exact ⟨meet_left l m h, meet_right l m h⟩
+
+theorem para_no_meet (l m : Line K) (h : Parallel l m) (hp : ¬Proportional l m) :
+  ∀ p, ¬(HasPoint l p ∧ HasPoint m p)
+:= by
+  rintro p ⟨lp, mp⟩
+  obtain ⟨k, hk, hla, hlb⟩ := (para_multiple l m).mp h
+  apply hp
+  refine ⟨k, hk, hla, hlb, ?_⟩
+  unfold HasPoint at lp mp
+  linear_combination lp - k * mp - p.x * hla - p.y * hlb
