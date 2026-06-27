@@ -196,7 +196,12 @@ local instance : FromJson ℚ where fromJson?
 
 /-- Removes an initial `-` sign from a polynomial with negative leading coefficient. -/
 def Poly.unNeg? : Poly → Option Poly
-  | .mul a b => return .mul (← a.unNeg?) b
+  | .mul a b => do
+    -- collapse a unit coefficient produced by the sign flip, so e.g. `-1 * b`
+    -- negates to `b` rather than the redundant `1 * b`
+    match ← a.unNeg? with
+    | .const 1 => return b
+    | a => return .mul a b
   | .const i => if i < 0 then some (.const (-i)) else none
   | .neg p => p
   | _ => none
