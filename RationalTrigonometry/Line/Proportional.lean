@@ -30,9 +30,8 @@ theorem propor_symm {l m : Line K} : Proportional l m → Proportional m l
   intro ⟨k, kn0, pa, pb, pc⟩
   unfold Proportional at ⊢
   refine ⟨1/k, ?_, ?_⟩
-  · intro invk0
-    simp only [one_div, inv_eq_zero] at invk0
-    exact kn0 invk0
+  · rw [one_div]
+    exact inv_ne_zero kn0
   · rw [pa, pb, pc]
     field_simp
     simp
