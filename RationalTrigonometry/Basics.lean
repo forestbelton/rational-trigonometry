@@ -10,20 +10,55 @@ import RationalTrigonometry.Line
 
 This file introduces the two fundamental quantities of rational trigonometry —
 `quad` (quadrance, the squared separation of two points) and `spread` (the
-rational replacement for the angle between two lines) — and states the main laws
+rational replacement for the angle between two lines) — with their basic
+properties (`quad_comm`, `spread_comm`, and `spread_para` / `spread_perp`, giving
+spread `0` for parallel and `1` for perpendicular lines), and states the main laws
 for a triple of points: the triple quad formula, Pythagoras, the spread law, the
 cross law, and the triple spread formula.
 
 A `Point3` is three pairwise-apart points; a `Triangle` refines it with a
 non-collinearity constraint.
+
+The spread-based laws (`spread_law` and `triple_spread`) require the quadrances to
+be nonzero: a spread divides by the quadrances of its arms, so a vanishing
+quadrance leaves it undefined. Over a general field `Apart` does not imply
+`quad ≠ 0` (see `RationalTrigonometry.Line.Null`), so this hypothesis is carried
+explicitly rather than derived from non-degeneracy.
 -/
 
 variable {K : Type*} [Field K]
 
 def quad (p q : Point K) : K := (q.x - p.x) ^ 2 + (q.y - p.y) ^ 2
 
+theorem quad_comm {p q : Point K} : quad p q = quad q p
+:= by
+  unfold quad
+  ring
+
 def spread (l m : Line K) : K :=
   ((l.a * m.b - m.a * l.b) ^ 2) / ((l.a ^ 2 + l.b ^ 2) * (m.a ^ 2 + m.b ^ 2))
+
+theorem spread_comm {l m : Line K} : spread l m = spread m l
+:= by
+  unfold spread
+  ring
+
+theorem spread_para {l m : Line K}
+: Parallel l m
+→ spread l m = 0
+:= by
+  unfold Parallel spread
+  intro plm
+  rw [plm]
+  ring
+
+theorem spread_perp {l m : Line K}
+: Perpendicular l m
+→ spread l m = 1
+:= by
+  unfold Perpendicular spread
+  intro plm
+  sorry
 
 structure Point3 (K : Type*) [Field K] where
   a₁ : Point K
