@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Forest Belton
 -/
 import RationalTrigonometry.Line.Defs
+import RationalTrigonometry.Line.Null
 import RationalTrigonometry.Line.Proportional
 import RationalTrigonometry.Line.Parallel
 import RationalTrigonometry.Line.Perpendicular
@@ -24,6 +25,7 @@ arbitrary field `K`. This file re-exports the development split across the
 * `Proportional`: two lines are proportional when their coefficients agree up to a nonzero scalar.
 * `Parallel`: two lines are parallel when `a₁ * b₂ - a₂ * b₁ = 0`.
 * `Perpendicular`: two lines are perpendicular when `a₁ * a₂ + b₁ * b₂ = 0`.
+* `Null`: a line whose direction has zero quadrance, `a ^ 2 + b ^ 2 = 0`.
 * `HasPoint`: a point lies on a line.
 * `line_between`: the line through two distinct points.
 
@@ -32,4 +34,6 @@ arbitrary field `K`. This file re-exports the development split across the
 * `proportionalSetoid` / `parallelSetoid`: `Proportional` and `Parallel` are equivalence relations.
 * `para_multiple`: parallel lines differ by a nonzero scalar on their leading coefficients.
 * `line_between_uniq`: the line through two points is unique up to proportionality.
+* `null_neg_one_square`: a null line forces `(b / a) ^ 2 = -1`, so null lines exist only when
+  `-1` is a square in `K`.
 -/

@@ -26,9 +26,6 @@ structure Line (K : Type*) [Field K] where
 
 def Central (l : Line K) : Prop := l.c = 0
 
-def Null (l : Line K) : Prop :=
-  l.a * l.a + l.b * l.b = 0
-
 @[ext]
 structure Point (K : Type*) [Field K] where
   x : K
