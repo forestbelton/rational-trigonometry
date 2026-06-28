@@ -18,21 +18,15 @@ through the origin (`Line0`), and points (`Point`), together with incidence
 variable {K : Type*} [Field K]
 
 @[ext]
-structure Line0 (K : Type*) [Field K] where
+structure Line (K : Type*) [Field K] where
   a : K
   b : K
+  c : K
   ab_ne_zero : a ≠ 0 ∨ b ≠ 0
 
-@[ext]
-structure Line (K : Type*) [Field K] extends Line0 K where
-  c : K
+def Central (l : Line K) : Prop := l.c = 0
 
-def line0 (l : Line0 K) : Line K :=
-  { a := l.a, b := l.b, c := 0, ab_ne_zero := l.ab_ne_zero }
-
-instance : Coe (Line0 K) (Line K) := ⟨line0⟩
-
-def IsNull (l : Line K) : Prop :=
+def Null (l : Line K) : Prop :=
   l.a * l.a + l.b * l.b = 0
 
 @[ext]

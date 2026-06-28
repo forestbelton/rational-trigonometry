@@ -27,11 +27,11 @@ theorem perp_symm (l m : Line K)
   linear_combination lm
 
 theorem perp_not_para (l m : Line K)
-: ¬IsNull l
+: ¬Null l
 → Perpendicular l m
 → ¬Parallel l m
 := by
-  unfold Perpendicular Parallel IsNull
+  unfold Perpendicular Parallel Null
   intro nnl lpm lmm
   have hma : (l.a * l.a + l.b * l.b) * m.a = 0 := by
     linear_combination l.a * lpm - l.b * lmm

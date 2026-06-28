@@ -62,28 +62,25 @@ theorem line_between_uniq {a b : Point K} (anb : Apart a b)
     simp only [HasPoint, line_between] at hla hlb hlc ⊢
     exact ⟨by rw [hla, hlb, hlc]; ring, by rw [hla, hlb, hlc]; ring⟩
 
-theorem line0_origin (l : Line0 K) : HasPoint (line0 l) origin
+theorem line_origin (l : Line K) : Central l → HasPoint l origin
 := by
-  unfold HasPoint line0 origin
-  simp
+  unfold HasPoint Central origin
+  intros
+  simpa
 
-theorem line0_negb_a (l : Line0 K) : HasPoint (line0 l) ⟨-l.b, l.a⟩
+theorem line_point (l : Line K) : Central l → (HasPoint l p ↔ ∃ c, p = ⟨c * -l.b, c * l.a⟩)
 := by
-  unfold HasPoint line0
-  simp
-  ring
-
-theorem line0_point (l : Line0 K) : HasPoint (line0 l) p ↔ ∃ c, p = ⟨c * -l.b, c * l.a⟩
-:= by
-  unfold HasPoint line0
-  simp only
+  unfold HasPoint Central
+  intro cl
   constructor
   · intro lp
     rcases l.ab_ne_zero with an0 | bn0
-    · exact ⟨p.y/l.a, Point.ext (by field_simp; linear_combination lp) (by field_simp)⟩
-    · exact ⟨-p.x/l.b, Point.ext (by field_simp) (by field_simp; linear_combination lp)⟩
+    · exact ⟨p.y/l.a, Point.ext (by field_simp; linear_combination lp - cl) (by field_simp)⟩
+    · exact ⟨-p.x/l.b, Point.ext (by field_simp) (by field_simp; linear_combination lp - cl)⟩
   · rintro ⟨c, rfl⟩
-    ring
+    ring_nf
+    assumption
+
 
 def meet (l m : Line K) : Point K :=
   ⟨(l.b * m.c - l.c * m.b) / (l.a * m.b - m.a * l.b),
