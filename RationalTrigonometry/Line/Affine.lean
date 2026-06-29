@@ -1,0 +1,112 @@
+/-
+Copyright (c) 2026 Forest Belton. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Forest Belton
+-/
+import RationalTrigonometry.Line.Defs
+import RationalTrigonometry.Line.Incidence
+
+/-!
+# Affine combinations of points
+
+A point `r` is an `AffineCombination` of `p` and `q` when `r = c₁ • p + c₂ • q`
+(`combine_affine`) with weights summing to one. The key fact (`line_between_affine`)
+is that, for distinct `p` and `q`, this is exactly incidence with `line_between p q`:
+the affine combinations of two points are precisely the points of the line through
+them.
+
+The `midpoint` is the affine combination with equal weights `1/2`. Its weights sum
+to one only when `2 ≠ 0`, so `midpoint_affine` assumes `[NeZero (2 : K)]`, excluding
+characteristic two.
+-/
+
+variable {K : Type*} [Field K]
+
+def combine_affine (p q : Point K) (c₁ c₂ : K) : Point K :=
+  ⟨c₁ * p.x + c₂ * q.x, c₁ * p.y + c₂ * q.y⟩
+
+def AffineCombination (p q : Point K) (r : Point K) : Prop :=
+  ∃ c₁ c₂, c₁ + c₂ = 1 ∧ r = combine_affine p q c₁ c₂
+
+theorem line_between_affine_left (p q : Point K)
+: (apq : Apart p q)
+→ AffineCombination p q r
+→ HasPoint (line_between p q apq) r
+:= by
+  unfold Apart
+  intro apq
+  unfold AffineCombination combine_affine HasPoint line_between
+  intro ⟨c₁, c₂, ⟨s1, h⟩⟩
+  have ⟨prx, pry⟩ := Point.ext_iff.mp h
+  linear_combination (q.y * p.x - p.y * q.x) * s1 + (q.y - p.y) * prx + (p.x - q.x) * pry
+
+theorem line_between_affine_right (p q : Point K)
+: (apq : Apart p q)
+→ HasPoint (line_between p q apq) r
+→ AffineCombination p q r
+:= by
+  unfold Apart
+  intro apq
+  unfold HasPoint line_between AffineCombination combine_affine
+  simp only
+  intro hr
+  rcases (line_between p q apq).ab_ne_zero with an0 | bn0
+  · simp only [line_between] at an0
+    have an0' : p.y - q.y ≠ 0 := sub_ne_zero.mpr (sub_ne_zero.mp an0).symm
+    let c₁ := (r.y - q.y) / (p.y - q.y)
+    refine ⟨c₁, 1 - c₁, by ring, ?_⟩
+    apply Point.ext_iff.mpr
+    simp only
+    have h₀ : r.y = c₁ * p.y + (1 - c₁) * q.y := by
+      rw [mul_sub_right_distrib, <- add_comm_sub, ← mul_sub_left_distrib]
+      dsimp only [c₁]
+      rw [div_mul, div_self an0']
+      ring
+    have h₁ : r.x = c₁ * p.x + (1 - c₁) * q.x := by
+      rw [h₀] at hr
+      dsimp only [c₁]
+      field_simp
+      apply add_right_cancel (b := -(r.x * (p.y - q.y)))
+      linear_combination (q.x - p.x) * h₀ - hr
+    exact ⟨h₁, h₀⟩
+  · simp only [line_between] at bn0
+    let c₁ := (r.x - q.x) / (p.x - q.x)
+    refine ⟨c₁, 1 - c₁, by ring, ?_⟩
+    apply Point.ext_iff.mpr
+    simp only
+    have h₀ : r.x = c₁ * p.x + (1 - c₁) * q.x := by
+      rw [mul_sub_right_distrib, <- add_comm_sub, ← mul_sub_left_distrib]
+      dsimp only [c₁]
+      rw [div_mul, div_self bn0]
+      ring
+    have h₁ : r.y = c₁ * p.y + (1 - c₁) * q.y := by
+      rw [h₀] at hr
+      dsimp only [c₁]
+      field_simp
+      apply add_right_cancel (b := -(r.y * (p.x - q.x)))
+      linear_combination (q.y - p.y) * h₀ + hr
+    exact ⟨h₀, h₁⟩
+
+theorem line_between_affine (p q : Point K)
+: (apq : Apart p q)
+→ AffineCombination p q r
+↔ HasPoint (line_between p q apq) r
+:= fun apq => ⟨
+  line_between_affine_left p q apq,
+  line_between_affine_right p q apq,
+⟩
+
+def midpoint (p q : Point K) : Point K := ⟨(p.x + q.x) / 2, (p.y + q.y) / 2⟩
+
+theorem midpoint_affine [NeZero (2 : K)] (p q : Point K) :
+Apart p q
+→ AffineCombination p q (midpoint p q)
+:= by
+  unfold Apart
+  unfold AffineCombination combine_affine midpoint
+  intro apq
+  refine ⟨1/2, 1/2, ?_, ?_⟩
+  · rw [← add_div, one_add_one_eq_two, div_self two_ne_zero]
+  · apply Point.ext_iff.mpr
+    simp only
+    exact ⟨by ring, by ring⟩
