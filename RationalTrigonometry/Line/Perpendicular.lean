@@ -4,14 +4,14 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Forest Belton
 -/
 import RationalTrigonometry.Line.Null
-import RationalTrigonometry.Line.Proportional
 import RationalTrigonometry.Line.Parallel
 
 /-!
 # Perpendicularity of lines
 
-Two lines are `Perpendicular` when `a₁ * a₂ + b₁ * b₂ = 0`, together with the
-construction `perp` of the perpendicular to a line through a given point.
+Two lines are `Perpendicular` when `a₁ * a₂ + b₁ * b₂ = 0`. This module collects
+the basic relational facts; the perpendicular to a line through a point is built
+as `altitude` in `RationalTrigonometry.Line.Incidence`.
 -/
 
 variable {K : Type*} [Field K]
@@ -95,37 +95,3 @@ theorem perp_of_perp_para (l m n : Line K)
       linear_combination mn
     rw [h₀, h₁]
     ring
-
-def perp (l : Line K) (p : Point K) : Line K := {
-  a := -l.b,
-  b := l.a,
-  c := l.b * p.x - l.a * p.y,
-  ab_ne_zero := by
-    rcases l.ab_ne_zero with an0 | bn0
-    · exact Or.inr an0
-    · exact Or.inl (neg_ne_zero.mpr bn0)
-}
-
-theorem perp_perp (l : Line K) (p : Point K) : Perpendicular l (perp l p)
-:= by
-  unfold Perpendicular perp
-  simp
-  ring
-
-theorem perp_point (l : Line K) (p : Point K) : HasPoint (perp l p) p
-:= by
-  unfold HasPoint perp
-  simp
-
-theorem perp_unique {l m : Line K}
-: Perpendicular l m
-→ HasPoint m p
-→ Proportional (perp l p) m
-:= by
-  intro lm mp
-  have h := perp_perp_para l (perp l p) m (perp_perp l p) lm
-  have ⟨k, hk, ha, hb⟩ := (para_multiple (perp l p) m).mp h
-  refine ⟨k, hk, ha, hb, ?_⟩
-  unfold HasPoint at mp
-  simp only [perp] at ha hb ⊢
-  linear_combination -p.x * ha - p.y * hb - k * mp
