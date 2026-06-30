@@ -96,14 +96,36 @@ structure Point3 (K : Type*) [Field K] where
   apart₂ : Apart a₁ a₃
   apart₃ : Apart a₂ a₃
 
-def Triangle (p : Point3 K) : Prop
-:= ¬ Collinear p.a₁ p.a₂ p.a₃
+def thales₀ (c : K) (t : Point3 K) : Point K := (1 - c) • t.a₁ + c • t.a₂
+def thales₁ (c : K) (t : Point3 K) : Point K := (1 - c) • t.a₁ + c • t.a₃
 
-def Q₁ (p : Point3 K) : K := quad p.a₂ p.a₃
+lemma thales_apart (c : K) (t : Point3 K) : (c ≠ 0) → Apart (thales₀ c t) (thales₁ c t)
+:= by
+  intro cn0
+  unfold Apart thales₀ thales₁
+  simp only [Point.add_x, Point.smul_x, ne_eq, add_right_inj, mul_eq_mul_left_iff, not_or,
+    Point.add_y, Point.smul_y]
+  rcases t.apart₃ with ax | ay
+  · exact Or.inl ⟨ax, cn0⟩
+  · exact Or.inr ⟨ay, cn0⟩
 
-def Q₂ (p : Point3 K) : K := quad p.a₁ p.a₃
+theorem thales (c : K) (t : Point3 K) : (cn0 : c ≠ 0) → Parallel
+  (line_between (thales₀ c t) (thales₁ c t) (thales_apart c t cn0))
+  (line_between t.a₂ t.a₃ t.apart₃)
+:= by
+  intro cn0
+  unfold Parallel line_between thales₀ thales₁
+  simp only [Point.add_y, Point.smul_y, add_sub_add_left_eq_sub, Point.add_x, Point.smul_x]
+  ring
 
-def Q₃ (p : Point3 K) : K := quad p.a₁ p.a₂
+def Triangle (t : Point3 K) : Prop
+:= ¬ Collinear t.a₁ t.a₂ t.a₃
+
+def Q₁ (t : Point3 K) : K := quad t.a₂ t.a₃
+
+def Q₂ (t : Point3 K) : K := quad t.a₁ t.a₃
+
+def Q₃ (t : Point3 K) : K := quad t.a₁ t.a₂
 
 theorem quads_ne_zero (p : Point3 K)
 : Neg1NotSquare K
@@ -117,14 +139,14 @@ theorem quads_ne_zero (p : Point3 K)
     quad_ne_zero nns p.apart₁,
   ⟩
 
-def s₁ (p : Point3 K) : K :=
-  spread (line_between p.a₁ p.a₂ p.apart₁) (line_between p.a₁ p.a₃ p.apart₂)
+def s₁ (t : Point3 K) : K :=
+  spread (line_between t.a₁ t.a₂ t.apart₁) (line_between t.a₁ t.a₃ t.apart₂)
 
-def s₂ (p : Point3 K) : K :=
-  spread (line_between p.a₁ p.a₂ p.apart₁) (line_between p.a₂ p.a₃ p.apart₃)
+def s₂ (t : Point3 K) : K :=
+  spread (line_between t.a₁ t.a₂ t.apart₁) (line_between t.a₂ t.a₃ t.apart₃)
 
-def s₃ (p : Point3 K) : K :=
-  spread (line_between p.a₁ p.a₃ p.apart₂) (line_between p.a₂ p.a₃ p.apart₃)
+def s₃ (t : Point3 K) : K :=
+  spread (line_between t.a₁ t.a₃ t.apart₂) (line_between t.a₂ t.a₃ t.apart₃)
 
 theorem triple_quad (t : Point3 K)
 : Collinear t.a₁ t.a₂ t.a₃
