@@ -22,11 +22,8 @@ characteristic two.
 
 variable {K : Type*} [Field K]
 
-def combine_affine (p q : Point K) (c₁ c₂ : K) : Point K :=
-  ⟨c₁ * p.x + c₂ * q.x, c₁ * p.y + c₂ * q.y⟩
-
 def AffineCombination (p q : Point K) (r : Point K) : Prop :=
-  ∃ c₁ c₂, c₁ + c₂ = 1 ∧ r = combine_affine p q c₁ c₂
+  ∃ c₁ c₂ : K, c₁ + c₂ = 1 ∧ r = c₁ • p + c₂ • q
 
 theorem line_between_affine_left (p q : Point K)
 : (apq : Apart p q)
@@ -35,9 +32,11 @@ theorem line_between_affine_left (p q : Point K)
 := by
   unfold Apart
   intro apq
-  unfold AffineCombination combine_affine HasPoint line_between
+  unfold AffineCombination HasPoint line_between
   intro ⟨c₁, c₂, ⟨s1, h⟩⟩
   have ⟨prx, pry⟩ := Point.ext_iff.mp h
+  simp at prx pry
+  simp only
   linear_combination (q.y * p.x - p.y * q.x) * s1 + (q.y - p.y) * prx + (p.x - q.x) * pry
 
 theorem line_between_affine_right (p q : Point K)
@@ -47,7 +46,7 @@ theorem line_between_affine_right (p q : Point K)
 := by
   unfold Apart
   intro apq
-  unfold HasPoint line_between AffineCombination combine_affine
+  unfold HasPoint line_between AffineCombination
   simp only
   intro hr
   rcases (line_between p q apq).ab_ne_zero with an0 | bn0
@@ -56,7 +55,6 @@ theorem line_between_affine_right (p q : Point K)
     let c₁ := (r.y - q.y) / (p.y - q.y)
     refine ⟨c₁, 1 - c₁, by ring, ?_⟩
     apply Point.ext_iff.mpr
-    simp only
     have h₀ : r.y = c₁ * p.y + (1 - c₁) * q.y := by
       rw [mul_sub_right_distrib, <- add_comm_sub, ← mul_sub_left_distrib]
       dsimp only [c₁]
@@ -73,7 +71,6 @@ theorem line_between_affine_right (p q : Point K)
     let c₁ := (r.x - q.x) / (p.x - q.x)
     refine ⟨c₁, 1 - c₁, by ring, ?_⟩
     apply Point.ext_iff.mpr
-    simp only
     have h₀ : r.x = c₁ * p.x + (1 - c₁) * q.x := by
       rw [mul_sub_right_distrib, <- add_comm_sub, ← mul_sub_left_distrib]
       dsimp only [c₁]
@@ -103,10 +100,13 @@ Apart p q
 → AffineCombination p q (midpoint p q)
 := by
   unfold Apart
-  unfold AffineCombination combine_affine midpoint
+  unfold AffineCombination midpoint
   intro apq
   refine ⟨1/2, 1/2, ?_, ?_⟩
   · rw [← add_div, one_add_one_eq_two, div_self two_ne_zero]
   · apply Point.ext_iff.mpr
-    simp only
+    simp only [one_div, Point.add_x, Point.smul_x, Point.add_y, Point.smul_y]
     exact ⟨by ring, by ring⟩
+
+def perp_bisector [NeZero (2 : K)] (p q : Point K) (apq : Apart p q) : Line K :=
+  altitude (line_between p q apq) (midpoint p q)

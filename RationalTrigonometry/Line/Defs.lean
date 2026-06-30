@@ -6,6 +6,8 @@ Authors: Forest Belton
 import Mathlib.Algebra.GroupWithZero.Basic
 import Mathlib.Algebra.CharZero.Defs
 import Mathlib.Algebra.Field.Defs
+import Mathlib.Tactic.Ring
+import RationalTrigonometry.Line.Point
 
 /-!
 # Lines and points: basic definitions
@@ -26,18 +28,11 @@ structure Line (K : Type*) [Field K] where
 
 def Central (l : Line K) : Prop := l.c = 0
 
-@[ext]
-structure Point (K : Type*) [Field K] where
-  x : K
-  y : K
-
 def HasPoint (l : Line K) (p : Point K) : Prop :=
   l.a * p.x + l.b * p.y + l.c = 0
 
 def Apart (a b : Point K) : Prop :=
   a.x ≠ b.x ∨ a.y ≠ b.y
-
-def origin : Point K := ⟨0, 0⟩
 
 def Collinear (a b c : Point K) : Prop :=
   ∃ l : Line K, HasPoint l a ∧ HasPoint l b ∧ HasPoint l c

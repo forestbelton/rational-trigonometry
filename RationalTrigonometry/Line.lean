@@ -8,6 +8,7 @@ import RationalTrigonometry.Line.Null
 import RationalTrigonometry.Line.Proportional
 import RationalTrigonometry.Line.Parallel
 import RationalTrigonometry.Line.Perpendicular
+import RationalTrigonometry.Line.Point
 import RationalTrigonometry.Line.Incidence
 
 /-!
