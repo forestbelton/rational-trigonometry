@@ -16,21 +16,18 @@ as `altitude` in `RationalTrigonometry.Line.Incidence`.
 
 variable {K : Type*} [Field K]
 
-def Perpendicular (l m : Line K) : Prop :=
-  l.a * m.a + l.b * m.b = 0
+def Perpendicular (ℓ₁ ℓ₂ : Line K) : Prop
+:= ℓ₁.a * ℓ₂.a + ℓ₁.b * ℓ₂.b = 0
 
-theorem perp_symm (l m : Line K)
-: Perpendicular l m
-→ Perpendicular m l
+infix:50 " ⊥ " => Perpendicular
+
+theorem perp_symm (ℓ₁ ℓ₂ : Line K) : ℓ₁ ⊥ ℓ₂ → ℓ₂ ⊥ ℓ₁
 := by
   unfold Perpendicular
-  intro lm
-  linear_combination lm
+  intro h
+  linear_combination h
 
-theorem perp_not_para (l m : Line K)
-: ¬Null l
-→ Perpendicular l m
-→ ¬Parallel l m
+theorem perp_not_para (l m : Line K) : ¬Null l → l ⊥ m → ¬(l ∥ m)
 := by
   unfold Perpendicular Parallel Null
   intro nnl lpm lmm
@@ -46,10 +43,7 @@ theorem perp_not_para (l m : Line K)
       · exact man0 ma0
       · exact mbn0 mb0
 
-theorem perp_perp_para (l m n : Line K)
-: Perpendicular l m
-→ Perpendicular l n
-→ Parallel m n
+theorem perp_perp_para (l m n : Line K) : l ⊥ m → l ⊥ n → m ∥ n
 := by
   unfold Perpendicular Parallel
   intro lm ln
@@ -71,10 +65,7 @@ theorem perp_perp_para (l m n : Line K)
     rw [h₀, h₁]
     ring
 
-theorem perp_of_perp_para (l m n : Line K)
-: Perpendicular l m
-→ Perpendicular m n
-→ Parallel l n
+theorem perp_of_perp_para (l m n : Line K) : l ⊥ m → m ⊥ n → l ∥ n
 := by
   unfold Perpendicular Parallel
   intro lm mn

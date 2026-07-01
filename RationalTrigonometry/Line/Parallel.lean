@@ -21,22 +21,21 @@ variable {K : Type*} [Field K]
 def Parallel (l m : Line K) : Prop :=
   l.a * m.b - m.a * l.b = 0
 
-theorem para_refl (l : Line K) : Parallel l l := by
+infix:50 " ∥ " => Parallel
+notation:50 l " ∦ " m => ¬(l ∥ m)
+
+theorem para_refl (l : Line K) : l ∥ l
+:= by
   unfold Parallel
   simp
 
-theorem para_symm {l m : Line K}
-: Parallel l m
-→ Parallel m l
+theorem para_symm {l m : Line K} : l ∥ m → m ∥ l
 := by
   unfold Parallel
   intro h
   linear_combination -h
 
-theorem para_trans {l m n : Line K}
-: Parallel l m
-→ Parallel m n
-→ Parallel l n
+theorem para_trans {l m n : Line K} : l ∥ m → m ∥ n → l ∥ n
 := by
   intro plm pmn
   unfold Parallel at plm pmn ⊢
@@ -66,9 +65,7 @@ instance parallelSetoid (K : Type*) [Field K] : Setoid (Line K) where
     trans := para_trans,
   }
 
-theorem para_multiple (l m : Line K)
-: Parallel l m
-↔ ∃ c ≠ 0, l.a = c * m.a ∧ l.b = c * m.b
+theorem para_multiple (l m : Line K) : l ∥ m ↔ ∃ c ≠ 0, l.a = c * m.a ∧ l.b = c * m.b
 := by
   unfold Parallel
   constructor

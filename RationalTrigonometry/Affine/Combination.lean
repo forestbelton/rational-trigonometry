@@ -110,3 +110,25 @@ Apart p q
 
 def perp_bisector [NeZero (2 : K)] (p q : Point K) (apq : Apart p q) : Line K :=
   altitude (line_between p q apq) (midpoint p q)
+
+def thales₀ (c : K) (t : Point3 K) : Point K := (1 - c) • t.a₁ + c • t.a₂
+def thales₁ (c : K) (t : Point3 K) : Point K := (1 - c) • t.a₁ + c • t.a₃
+
+lemma thales_apart (c : K) (t : Point3 K) : (c ≠ 0) → Apart (thales₀ c t) (thales₁ c t)
+:= by
+  intro cn0
+  unfold Apart thales₀ thales₁
+  simp only [Point.add_x, Point.smul_x, ne_eq, add_right_inj, mul_eq_mul_left_iff, not_or,
+    Point.add_y, Point.smul_y]
+  rcases t.apart₃ with ax | ay
+  · exact Or.inl ⟨ax, cn0⟩
+  · exact Or.inr ⟨ay, cn0⟩
+
+theorem thales (c : K) (t : Point3 K) : (cn0 : c ≠ 0) → Parallel
+  (line_between (thales₀ c t) (thales₁ c t) (thales_apart c t cn0))
+  (line_between t.a₂ t.a₃ t.apart₃)
+:= by
+  intro cn0
+  unfold Parallel line_between thales₀ thales₁
+  simp only [Point.add_y, Point.smul_y, add_sub_add_left_eq_sub, Point.add_x, Point.smul_x]
+  ring

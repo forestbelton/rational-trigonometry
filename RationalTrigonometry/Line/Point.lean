@@ -13,6 +13,17 @@ variable {K : Type*} [Field K]
   x : K
   y : K
 
+def Apart (a b : Point K) : Prop :=
+  a.x ≠ b.x ∨ a.y ≠ b.y
+
+structure Point3 (K : Type*) [Field K] where
+  a₁ : Point K
+  a₂ : Point K
+  a₃ : Point K
+  apart₁ : Apart a₁ a₂
+  apart₂ : Apart a₁ a₃
+  apart₃ : Apart a₂ a₃
+
 def origin : Point K := ⟨0, 0⟩
 
 namespace Point

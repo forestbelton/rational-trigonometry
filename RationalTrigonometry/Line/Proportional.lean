@@ -17,6 +17,8 @@ incidence (`propor_point`).
 
 variable {K : Type*} [Field K]
 
+notation:50 l " ≄ " m => ¬(l ≈ m)
+
 def Proportional (l m : Line K) : Prop :=
   ∃ k ≠ 0, l.a = k * m.a ∧ l.b = k * m.b ∧ l.c = k * m.c
 
@@ -60,9 +62,9 @@ instance proportionalSetoid (K : Type*) [Field K] : Setoid (Line K) where
     trans := propor_trans,
   }
 
-theorem propor_point (l m : Line K) : Proportional l m → (HasPoint l p ↔ HasPoint m p)
+theorem propor_point (l m : Line K) : l ≈ m → (HasPoint l p ↔ HasPoint m p)
 := by
-  unfold HasPoint Proportional
+  unfold HasPoint
   intro ⟨k, kn0, hla, hlb, hlc⟩
   constructor
   · intro lp

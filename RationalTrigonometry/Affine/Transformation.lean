@@ -6,10 +6,9 @@ Authors: Forest Belton
 import Mathlib.Algebra.GroupWithZero.Basic
 import Mathlib.Algebra.CharZero.Defs
 import Mathlib.Algebra.Field.Defs
-import Mathlib.Algebra.Field.Rat
+import Mathlib.Tactic.LinearCombination
 import RationalTrigonometry.Line.Defs
-
-import PolyrithLocal.Polyrith
+import RationalTrigonometry.Line.Point
 
 variable {K : Type u} [Field K]
 

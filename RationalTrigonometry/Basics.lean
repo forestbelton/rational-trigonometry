@@ -71,52 +71,18 @@ theorem spread_comm {l m : Line K} : spread l m = spread m l
   unfold spread
   ring
 
-theorem spread_para {l m : Line K}
-: Parallel l m
-→ spread l m = 0
+theorem spread_para {ℓ₁ ℓ₂ : Line K} : ℓ₁ ∥ ℓ₂ → spread ℓ₁ ℓ₂ = 0
 := by
   unfold Parallel spread
   intro plm
   rw [plm]
   ring
 
-theorem spread_perp {l m : Line K}
-: Perpendicular l m
-→ spread l m = 1
+theorem spread_perp {ℓ₁ ℓ₂ : Line K} : ℓ₁ ⊥ ℓ₂ → spread ℓ₁ ℓ₂ = 1
 := by
   unfold Perpendicular spread
   intro plm
   sorry
-
-structure Point3 (K : Type*) [Field K] where
-  a₁ : Point K
-  a₂ : Point K
-  a₃ : Point K
-  apart₁ : Apart a₁ a₂
-  apart₂ : Apart a₁ a₃
-  apart₃ : Apart a₂ a₃
-
-def thales₀ (c : K) (t : Point3 K) : Point K := (1 - c) • t.a₁ + c • t.a₂
-def thales₁ (c : K) (t : Point3 K) : Point K := (1 - c) • t.a₁ + c • t.a₃
-
-lemma thales_apart (c : K) (t : Point3 K) : (c ≠ 0) → Apart (thales₀ c t) (thales₁ c t)
-:= by
-  intro cn0
-  unfold Apart thales₀ thales₁
-  simp only [Point.add_x, Point.smul_x, ne_eq, add_right_inj, mul_eq_mul_left_iff, not_or,
-    Point.add_y, Point.smul_y]
-  rcases t.apart₃ with ax | ay
-  · exact Or.inl ⟨ax, cn0⟩
-  · exact Or.inr ⟨ay, cn0⟩
-
-theorem thales (c : K) (t : Point3 K) : (cn0 : c ≠ 0) → Parallel
-  (line_between (thales₀ c t) (thales₁ c t) (thales_apart c t cn0))
-  (line_between t.a₂ t.a₃ t.apart₃)
-:= by
-  intro cn0
-  unfold Parallel line_between thales₀ thales₁
-  simp only [Point.add_y, Point.smul_y, add_sub_add_left_eq_sub, Point.add_x, Point.smul_x]
-  ring
 
 def Triangle (t : Point3 K) : Prop
 := ¬ Collinear t.a₁ t.a₂ t.a₃
@@ -127,9 +93,7 @@ def Q₂ (t : Point3 K) : K := quad t.a₁ t.a₃
 
 def Q₃ (t : Point3 K) : K := quad t.a₁ t.a₂
 
-theorem quads_ne_zero (p : Point3 K)
-: Neg1NotSquare K
-→ Q₁ p ≠ 0 ∧ Q₂ p ≠ 0 ∧ Q₃ p ≠ 0
+theorem quads_ne_zero (p : Point3 K) : Neg1NotSquare K → Q₁ p ≠ 0 ∧ Q₂ p ≠ 0 ∧ Q₃ p ≠ 0
 := by
   intro nns
   simp only [Q₁, Q₂, Q₃]
@@ -160,7 +124,7 @@ theorem triple_quad (t : Point3 K)
 
 theorem pythag (t : Point3 K) (h : Triangle t)
 : Q₁ t + Q₂ t = Q₃ t
-↔ Perpendicular (line_between t.a₁ t.a₃ t.apart₂) (line_between t.a₂ t.a₃ t.apart₃)
+↔ (line_between t.a₁ t.a₃ t.apart₂) ⊥ (line_between t.a₂ t.a₃ t.apart₃)
 := sorry
 
 theorem spread_law (t : Point3 K)
@@ -172,8 +136,7 @@ theorem spread_law (t : Point3 K)
 
 def c₃ (t : Point3 K) : K := 1 - s₃ t
 
-theorem cross_law (t : Point3 K)
-: (Q₁ t + Q₂ t - Q₃ t) ^ 2 = 4 * Q₁ t * Q₂ t * c₃ t
+theorem cross_law (t : Point3 K) : (Q₁ t + Q₂ t - Q₃ t) ^ 2 = 4 * Q₁ t * Q₂ t * c₃ t
 := by
   sorry
 

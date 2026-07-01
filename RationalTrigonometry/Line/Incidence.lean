@@ -26,8 +26,9 @@ it from a point.
 
 variable {K : Type*} [Field K]
 
-def line_between (a b : Point K) (anb : Apart a b) : Line K :=
-  { a := b.y - a.y,
+def line_between (a b : Point K) (anb : Apart a b) : Line K
+:=
+{ a := b.y - a.y,
     b := a.x - b.x,
     c := a.y * b.x - a.x * b.y,
     ab_ne_zero := by
@@ -52,8 +53,7 @@ theorem line_between_right (a b : Point K)
   ring
 
 theorem line_between_uniq {a b : Point K} (anb : Apart a b)
-: (HasPoint l a ∧ HasPoint l b) ↔ Proportional l (line_between a b anb) := by
-  unfold Proportional
+: (HasPoint l a ∧ HasPoint l b) ↔ l ≈ (line_between a b anb) := by
   constructor
   · intro ⟨ha, hb⟩
     have hpar : Parallel l (line_between a b anb) := by
@@ -88,13 +88,15 @@ theorem line_point (l : Line K) : Central l → (HasPoint l p ↔ ∃ c, p = ⟨
     ring_nf
     assumption
 
-def Intersects (l m : Line K) (p : Point K) : Prop := HasPoint l p ∧ HasPoint m p
+def Intersects (l m : Line K) (p : Point K) : Prop
+:= HasPoint l p ∧ HasPoint m p
 
-def meet (l m : Line K) : Point K :=
+def meet (l m : Line K) : Point K
+:=
   ⟨(l.b * m.c - l.c * m.b) / (l.a * m.b - m.a * l.b),
    (l.c * m.a - l.a * m.c) / (l.a * m.b - m.a * l.b)⟩
 
-theorem meet_intersects (l m : Line K) (h : ¬ Parallel l m) : Intersects l m (meet l m)
+theorem meet_intersects (l m : Line K) (h : ¬(l ∥ m)) : Intersects l m (meet l m)
 := by
   simp only [Intersects]
   simp only [Parallel] at h
@@ -115,9 +117,7 @@ theorem meet_intersects (l m : Line K) (h : ¬ Parallel l m) : Intersects l m (m
     field_simp
     ring
 
-theorem meet_uniq (l m : Line K) (h : ¬ Parallel l m) (p : Point K)
-: Intersects l m p
-↔ p = (meet l m)
+theorem meet_uniq (l m : Line K) (h : l ∦ m) (p : Point K) : Intersects l m p ↔ p = (meet l m)
 := by
   constructor
   · intro ⟨a, b⟩
@@ -132,8 +132,7 @@ theorem meet_uniq (l m : Line K) (h : ¬ Parallel l m) (p : Point K)
   · rintro rfl
     exact meet_intersects l m h
 
-theorem para_no_meet (l m : Line K) (h : Parallel l m) (hp : ¬Proportional l m) :
-  ∀ p, ¬(HasPoint l p ∧ HasPoint m p)
+theorem para_no_meet (l m : Line K) (h : l ∥ m) (hp : l ≄ m) : ∀ p, ¬(HasPoint l p ∧ HasPoint m p)
 := by
   rintro p ⟨lp, mp⟩
   obtain ⟨k, hk, hla, hlb⟩ := (para_multiple l m).mp h
@@ -142,7 +141,8 @@ theorem para_no_meet (l m : Line K) (h : Parallel l m) (hp : ¬Proportional l m)
   unfold HasPoint at lp mp
   linear_combination lp - k * mp - p.x * hla - p.y * hlb
 
-def para_through (l : Line K) (p : Point K) : Line K := {
+def para_through (l : Line K) (p : Point K) : Line K
+:= {
   a := l.a,
   b := l.b,
   c := -l.a * p.x - l.b * p.y,
@@ -159,7 +159,8 @@ theorem para_through_para (l : Line K) (p : Point K) : Parallel l (para_through 
   unfold Parallel para_through
   ring
 
-def altitude (l : Line K) (p : Point K) : Line K := {
+def altitude (l : Line K) (p : Point K) : Line K
+:= {
   a := -l.b,
   b := l.a,
   c := l.b * p.x - l.a * p.y,
@@ -174,16 +175,13 @@ theorem altitude_point (l : Line K) (p : Point K) : HasPoint (altitude l p) p
   unfold HasPoint altitude
   ring
 
-theorem altitude_perp : (l : Line K) → (p : Point K) → Perpendicular l (altitude l p)
+theorem altitude_perp : (ℓ : Line K) → (p : Point K) → ℓ ⊥ (altitude ℓ p)
 := by
   intros
   unfold Perpendicular altitude
   ring
 
-theorem altitude_unique {l m : Line K}
-: Perpendicular l m
-→ HasPoint m p
-→ Proportional (altitude l p) m
+theorem altitude_unique {l m : Line K} : l ⊥ m → HasPoint m p → altitude l p ≈ m
 := by
   intro lm mp
   have h := perp_perp_para l (altitude l p) m (altitude_perp l p) lm
